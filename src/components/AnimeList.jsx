@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite }) => {
+export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite, toggleBlock }) => {
   if (loading) return <p>Cargando catálogo desde Kitsu API...</p>;
   if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
   if (!animes || animes.length === 0) return <p>No se encontraron resultados.</p>;
@@ -8,7 +8,6 @@ export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite })
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
       {animes.map((anime) => {
-        // Comprobación booleana de estado derivado
         const isFavorite = favorites.some(fav => fav.id === anime.id);
 
         return (
@@ -22,23 +21,39 @@ export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite })
               {anime.attributes.canonicalTitle}
             </h3>
             
-            <button
-              onClick={() => toggleFavorite(anime)}
-              style={{
-                marginTop: '10px',
-                padding: '10px',
-                cursor: 'pointer',
-                borderRadius: '4px',
-                fontWeight: 'bold',
-                transition: 'all 0.2s',
-                // Cambio dinámico de estilos según el estado
-                background: isFavorite ? '#fff' : '#ff4b4b',
-                color: isFavorite ? '#ff4b4b' : '#fff',
-                border: isFavorite ? '2px solid #ff4b4b' : '2px solid transparent',
-              }}
-            >
-              {isFavorite ? '★ Quitar Favorito' : '☆ Marcar Favorito'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <button
+                onClick={() => toggleFavorite(anime)}
+                style={{
+                  flex: 1,
+                  padding: '8px',
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  fontWeight: 'bold',
+                  background: isFavorite ? '#fff' : '#ff4b4b',
+                  color: isFavorite ? '#ff4b4b' : '#fff',
+                  border: isFavorite ? '2px solid #ff4b4b' : '2px solid transparent',
+                }}
+              >
+                {isFavorite ? '★ Quitar' : '☆ Favorito'}
+              </button>
+
+              <button
+                onClick={() => toggleBlock(anime)}
+                style={{
+                  flex: 1,
+                  padding: '8px',
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  fontWeight: 'bold',
+                  background: '#333',
+                  color: '#fff',
+                  border: 'none',
+                }}
+              >
+                🚫 Bloquear
+              </button>
+            </div>
           </div>
         );
       })}
