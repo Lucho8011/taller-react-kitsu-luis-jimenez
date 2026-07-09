@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Hook para consultar la API de Kitsu.
+ * Soporta reemplazo de resultados en búsquedas nuevas y anexado para paginación.
+ */
 export const useFetch = (url, options = {}) => {
   const { append = false, resetKey = '' } = options;
   const [data, setData] = useState(null);
@@ -29,6 +33,7 @@ export const useFetch = (url, options = {}) => {
             return incomingData;
           }
 
+          // Evita duplicados al anexar páginas consecutivas de resultados.
           const existingIds = new Set(prevData.map((anime) => anime.id));
           const newItems = incomingData.filter((anime) => !existingIds.has(anime.id));
           return [...prevData, ...newItems];

@@ -6,6 +6,8 @@ import { SearchBar } from './components/SearchBar';
 import { Sidebar } from './components/Sidebar';
 import './index.css';
 
+// Componente raíz que coordina búsqueda remota, paginación incremental
+// y filtros locales sobre favoritos y bloqueados.
 function App() {
   const PAGE_LIMIT = 20;
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +52,7 @@ function App() {
   const isLoadingMore = loading && Boolean(animes && animes.length > 0);
   const blockedVisibleCount = (animes?.length || 0) - filteredAnimes.length;
 
+  // Reinicia la paginación cuando cambia el criterio de búsqueda.
   const handleSearchChange = (value) => {
     setSearchTerm(value);
     setPageOffset(0);
@@ -71,11 +74,13 @@ function App() {
         return prevBlocked.filter((item) => item.id !== anime.id);
       }
 
+      // Mantiene coherencia entre listas: un anime bloqueado no puede seguir en favoritos.
       setFavorites((prevFavs) => prevFavs.filter((item) => item.id !== anime.id));
       return [...prevBlocked, anime];
     });
   };
 
+  // Solicita la siguiente página solo cuando la API indica que existen más resultados.
   const handleLoadMore = () => {
     if (loading || !hasMore) return;
     setPageOffset((currentOffset) => currentOffset + PAGE_LIMIT);

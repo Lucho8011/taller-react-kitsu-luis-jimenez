@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Hook reutilizable para persistir estado local en localStorage
+ * con lectura inicial segura y sincronización automática.
+ */
 export const useLocalStorage = (key, initialValue) => {
-  // Inicialización perezosa: lee de localStorage solo la primera vez
   const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -12,7 +15,6 @@ export const useLocalStorage = (key, initialValue) => {
     }
   });
 
-  // Efecto secundario: escribe en localStorage cada vez que storedValue cambia
   useEffect(() => {
     try {
       window.localStorage.setItem(key, JSON.stringify(storedValue));
