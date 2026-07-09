@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useFetch } from './hooks/useFetch';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { AnimeList } from './components/AnimeList';
@@ -9,71 +9,85 @@ import './index.css';
 function App() {
   const { data: animes, loading, error } = useFetch('https://kitsu.io/api/edge/anime?page[limit]=20');
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // Implementación del Custom Hook de persistencia
   const [favorites, setFavorites] = useLocalStorage('kitsu_favorites', []);
   const [blocked, setBlocked] = useLocalStorage('kitsu_blocked', []);
+  const normalizedSearch = searchTerm.trim().toLowerCase();
 
-  const filteredAnimes = animes 
-    ? animes.filter(anime => {
-        const matchesSearch = anime.attributes.canonicalTitle.toLowerCase().includes(searchTerm.toLowerCase());
-        const isNotBlocked = !blocked.some(b => b.id === anime.id);
+  const filteredAnimes = animes
+    ? animes.filter((anime) => {
+        const title = anime.attributes?.canonicalTitle || anime.attributes?.titles?.en || '';
+        const matchesSearch = title.toLowerCase().includes(normalizedSearch);
+        const isNotBlocked = !blocked.some((item) => item.id === anime.id);
         return matchesSearch && isNotBlocked;
-      }) 
+      })
     : [];
 
   const toggleFavorite = (anime) => {
-    setFavorites(prevFavorites => {
-      const exists = prevFavorites.some(fav => fav.id === anime.id);
-      if (exists) return prevFavorites.filter(fav => fav.id !== anime.id);
+    setFavorites((prevFavorites) => {
+      const exists = prevFavorites.some((fav) => fav.id === anime.id);
+      if (exists) return prevFavorites.filter((fav) => fav.id !== anime.id);
       return [...prevFavorites, anime];
     });
   };
 
   const toggleBlock = (anime) => {
-    setBlocked(prevBlocked => {
-      const isBlocked = prevBlocked.some(b => b.id === anime.id);
+    setBlocked((prevBlocked) => {
+      const isBlocked = prevBlocked.some((item) => item.id === anime.id);
+
       if (isBlocked) {
-        return prevBlocked.filter(b => b.id !== anime.id);
-      } else {
-        setFavorites(prevFavs => prevFavs.filter(f => f.id !== anime.id));
-        return [...prevBlocked, anime];
+        return prevBlocked.filter((item) => item.id !== anime.id);
       }
+
+      setFavorites((prevFavs) => prevFavs.filter((item) => item.id !== anime.id));
+      return [...prevBlocked, anime];
     });
   };
 
   return (
-    <div className="app-container" style={{ padding: '20px', fontFamily: 'system-ui, sans-serif', backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <header style={{ marginBottom: '20px' }}>
-        <h1 style={{ color: '#ff4b4b' }}>Directorio de Anime - Kitsu API</h1>
+    <div className="app-shell">
+      <header className="app-header">
+        <p className="eyebrow">Proyecto Front-End con React + Kitsu API</p>
+        <h1 className="app-title">Directorio de Anime</h1>
+        <p className="app-subtitle">
+          Explora animes, filtra por título y gestiona tus favoritos y bloqueados con persistencia local.
+        </p>
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </header>
-      
-      <main style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        <section style={{ flex: '3' }}>
-          <h2 style={{ marginBottom: '15px' }}>Catálogo ({filteredAnimes.length})</h2>
-          <AnimeList 
-            animes={filteredAnimes} 
-            loading={loading} 
-            error={error} 
+
+      <main className="main-layout">
+        <section className="content-section">
+          <div className="section-heading">
+            <h2>Catálogo ({filteredAnimes.length})</h2>
+            <p className="helper-text">La búsqueda filtra el conjunto actualmente consultado desde la API.</p>
+          </div>
+
+          <AnimeList
+            animes={filteredAnimes}
+            loading={loading}
+            error={error}
             favorites={favorites}
             toggleFavorite={toggleFavorite}
             toggleBlock={toggleBlock}
           />
         </section>
 
-        <aside style={{ flex: '1', borderLeft: '2px solid #eaeaea', paddingLeft: '20px', minWidth: '300px' }}>
+        <aside className="sidebar-section">
           <h2>Gestión de Listas</h2>
-          <Sidebar 
-            favorites={favorites} 
-            toggleFavorite={toggleFavorite} 
+          <Sidebar
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
             blocked={blocked}
             toggleBlock={toggleBlock}
-            // Inyectamos el total de elementos descargados para las estadísticas
-            totalElements={animes ? animes.length : 0} 
+            totalElements={animes ? animes.length : 0}
           />
         </aside>
       </main>
+
+      <footer className="app-footer">
+        <p>
+          <strong>Proyecto Front-End</strong> | Desarrollado por: Luis Jimenez
+        </p>
+      </footer>
     </div>
   );
 }

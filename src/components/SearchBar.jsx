@@ -1,21 +1,16 @@
-import React from 'react';
-
 export const SearchBar = ({ searchTerm, setSearchTerm }) => {
   return (
-    <div style={{ marginBottom: '20px' }}>
+    <div className="search-bar">
+      <label className="sr-only" htmlFor="anime-search">
+        Buscar anime por título
+      </label>
       <input
+        id="anime-search"
         type="text"
         placeholder="Buscar anime por título..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '12px',
-          borderRadius: '8px',
-          border: '1px solid #ccc',
-          fontSize: '1rem',
-          boxSizing: 'border-box'
-        }}
+        className="search-input"
       />
     </div>
   );

@@ -1,60 +1,44 @@
-import React from 'react';
-
 export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite, toggleBlock }) => {
-  if (loading) return <p>Cargando catálogo desde Kitsu API...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
-  if (!animes || animes.length === 0) return <p>No se encontraron resultados.</p>;
+  if (loading) return <p className="status-message">Cargando catálogo desde Kitsu API...</p>;
+  if (error) return <p className="status-message status-error">Error: {error}</p>;
+  if (!animes || animes.length === 0) {
+    return <p className="status-message">No se encontraron resultados para tu búsqueda.</p>;
+  }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+    <div className="anime-grid">
       {animes.map((anime) => {
-        const isFavorite = favorites.some(fav => fav.id === anime.id);
+        const isFavorite = favorites.some((fav) => fav.id === anime.id);
+        const title = anime.attributes?.canonicalTitle || anime.attributes?.titles?.en || 'Título no disponible';
+        const poster =
+          anime.attributes?.posterImage?.small ||
+          anime.attributes?.posterImage?.original ||
+          'https://placehold.co/300x450?text=Sin+imagen';
 
         return (
-          <div key={anime.id} style={{ border: '1px solid #ddd', padding: '10px', borderRadius: '8px', background: '#fff', display: 'flex', flexDirection: 'column' }}>
-            <img
-              src={anime.attributes.posterImage.small}
-              alt={anime.attributes.canonicalTitle}
-              style={{ width: '100%', borderRadius: '4px', objectFit: 'cover' }}
-            />
-            <h3 style={{ fontSize: '1rem', marginTop: '10px', color: '#333', flex: 1 }}>
-              {anime.attributes.canonicalTitle}
-            </h3>
-            
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+          <article key={anime.id} className="anime-card">
+            <img src={poster} alt={`Poster de ${title}`} className="anime-poster" />
+
+            <h3 className="anime-title">{title}</h3>
+
+            <div className="anime-actions">
               <button
                 onClick={() => toggleFavorite(anime)}
-                style={{
-                  flex: 1,
-                  padding: '8px',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  fontWeight: 'bold',
-                  background: isFavorite ? '#fff' : '#ff4b4b',
-                  color: isFavorite ? '#ff4b4b' : '#fff',
-                  border: isFavorite ? '2px solid #ff4b4b' : '2px solid transparent',
-                }}
+                className={`action-button ${isFavorite ? 'button-secondary' : 'button-primary'}`}
+                aria-label={isFavorite ? `Quitar ${title} de favoritos` : `Agregar ${title} a favoritos`}
               >
                 {isFavorite ? '★ Quitar' : '☆ Favorito'}
               </button>
 
               <button
                 onClick={() => toggleBlock(anime)}
-                style={{
-                  flex: 1,
-                  padding: '8px',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  fontWeight: 'bold',
-                  background: '#333',
-                  color: '#fff',
-                  border: 'none',
-                }}
+                className="action-button button-dark"
+                aria-label={`Bloquear ${title}`}
               >
                 🚫 Bloquear
               </button>
             </div>
-          </div>
+          </article>
         );
       })}
     </div>

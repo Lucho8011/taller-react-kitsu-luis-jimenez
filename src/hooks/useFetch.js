@@ -6,22 +6,34 @@ export const useFetch = (url) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchData = async () => {
       setLoading(true);
+      setError(null);
+
       try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Error de conexión con la API');
+        const response = await fetch(url, { signal: controller.signal });
+
+        if (!response.ok) {
+          throw new Error('Error de conexión con la API');
+        }
+
         const result = await response.json();
-        // Kitsu envuelve su respuesta principal dentro de un objeto 'data'
-        setData(result.data); 
+        setData(Array.isArray(result.data) ? result.data : []);
       } catch (err) {
+        if (err.name === 'AbortError') return;
+
         setError(err.message);
+        setData([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
+
+    return () => controller.abort();
   }, [url]);
 
   return { data, loading, error };
