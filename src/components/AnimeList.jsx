@@ -17,7 +17,10 @@ export const AnimeList = ({ animes, loading, error, favorites, toggleFavorite, t
 
         return (
           <article key={anime.id} className="anime-card">
-            <img src={poster} alt={`Poster de ${title}`} className="anime-poster" />
+            <div className="anime-poster-wrap">
+              <img src={poster} alt={`Poster de ${title}`} className="anime-poster" />
+              <span className="anime-badge">{isFavorite ? 'Favorito' : 'Kitsu Pick'}</span>
+            </div>
 
             <h3 className="anime-title">{title}</h3>
 

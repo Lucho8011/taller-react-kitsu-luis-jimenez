@@ -1,4 +1,11 @@
 export const Sidebar = ({ favorites, toggleFavorite, blocked, toggleBlock, totalElements }) => {
+  const sortedFavorites = [...favorites].sort((a, b) =>
+    (a.attributes?.canonicalTitle || '').localeCompare(b.attributes?.canonicalTitle || '')
+  );
+  const sortedBlocked = [...blocked].sort((a, b) =>
+    (a.attributes?.canonicalTitle || '').localeCompare(b.attributes?.canonicalTitle || '')
+  );
+
   return (
     <div className="sidebar-content">
       <div className="stats-card">
@@ -18,7 +25,7 @@ export const Sidebar = ({ favorites, toggleFavorite, blocked, toggleBlock, total
           <p className="empty-text">No tienes animes favoritos aún.</p>
         ) : (
           <ul className="plain-list">
-            {favorites.map((anime) => {
+            {sortedFavorites.map((anime) => {
               const title = anime.attributes?.canonicalTitle || 'Título no disponible';
 
               return (
@@ -44,7 +51,7 @@ export const Sidebar = ({ favorites, toggleFavorite, blocked, toggleBlock, total
           <p className="empty-text">No hay animes bloqueados.</p>
         ) : (
           <ul className="plain-list">
-            {blocked.map((anime) => {
+            {sortedBlocked.map((anime) => {
               const title = anime.attributes?.canonicalTitle || 'Título no disponible';
 
               return (
